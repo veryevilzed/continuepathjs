@@ -3,41 +3,45 @@ class ContinuePath
     constructor: () ->
         @actions = []
         @errors = []
-        @deltaTime = 0
+        @dt = 0
 
     add: (actionCallback) => 
-        actions.push(actionCallback)
+        @actions.push(actionCallback)
         @
 
     error: (actionCallback) =>
-        error.push(actionCallback)
+        @error.push(actionCallback)
         @
 
     currentAction: () => 
-        if (@actions? && @actions.length > 0)
+        
+        if (@actions.length > 0)
             @actions[0]
-        null
+        else
+            null
 
     update: (deltaTime) =>
-        @deltaTime += deltaTime;
         cur = @currentAction()
         if !cur
             return;
-
+        @dt += deltaTime;
         status = cur(@)
-        if (status.startWith("err"))
+        if (status?.startsWith("err"))
             @actions = @errors
             @errors = []
-            @deltaTime = 0
-        else if (status.startWith("im"))
-            @deltaTime = 0
-            @actions.pop()
+            @dt = 0
+        else if (status?.startsWith("im"))
+            @dt = 0
+            @actions.splice(0, 1)
             @update(0)
-        else if (status != "contunue")
-            @actions.pop()
-            @deltaTime = 0
+        else if (status?.startsWith("cont") || status == "cnt")
+            null
+        else
+            @dt = 0
+            @actions.splice(0, 1)
 
 
 
+module.exports = ContinuePath
 
 
